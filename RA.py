@@ -5,44 +5,43 @@ import numpy as np
 
 loaded_bins, loaded_flowers = load_data()
 
-
-
-# Function to check if the bin have enoungh free space to put flower
+# Function to check if the bin have enough free space to put flower
 def can_fit(large_matrix, start_row, start_col, block_rows, block_cols):
     return np.all(large_matrix[start_row:start_row+block_rows, start_col:start_col+block_cols] == 0)
 
 def random_algorith2(bins_matrices, flowers_matrices):
     remaining_flowers = flowers_matrices[:]
-    print(len(remaining_flowers))
+    print("Length of remiang flowers", len(remaining_flowers))
 
     while len(remaining_flowers) > 0:
+        print("Length of remiang flowers", len(remaining_flowers))
+
         flower = random.choice(remaining_flowers)
         placed = False 
         bin = random.choice(bins_matrices)
 
         while not placed:
-            placed = put_flower(bin, flower)
-            print(f"Bin matrix shape: {bin.shape}")
+            placed, updated_bin = put_flower(bin, flower)
+            print(f"Bin matrix shape: {updated_bin.shape}")
             print(f"Trying to place flower of shape: {flower.shape}")
-
             if placed:
-                for i, remaining_flowers in enumerate(remaining_flowers):
-                    if np.array_equal(flower, remaining_flowers):
-                        print(flower, i)
-                        np.delete(remaining_flowers, i)
-                        print(remaining_flowers)
-                        break
-                    print("Small matrix placed successfully:\n", bin)
-                    print(len(remaining_flowers))
-
+                for index, flower2 in enumerate(remaining_flowers):
+                    if np.array_equal(flower, flower2):
+                        print(index)
+                        remaining_flowers.pop(index)
+                # Update bin
+                for index, bin2 in enumerate(remaining_flowers):
+                    if np.array_equal(bin, bin2):
+                        print(index)
+                        bins_matrices[index] = updated_bin
+                
+                print("Small matrix placed successfully:\n", updated_bin)
             else:
                 bin = random.choice(bins_matrices)
 
     return bins_matrices
 
             
-
-
 def put_flower(large_matrix, small_matrix):
     large_rows, large_cols = large_matrix.shape
     small_rows, small_cols = small_matrix.shape
@@ -56,8 +55,9 @@ def put_flower(large_matrix, small_matrix):
                 break
         if placed:
             break
-    return placed
+    return placed, large_matrix
 
-#placed = put_flower(bin_matrix, flower_matrix)
-# Output the result
+
 placed = random_algorith2(bins_matrices, flowers_pools)
+
+print(placed)
