@@ -1,5 +1,6 @@
 import csv
 import os
+import numpy as np
 
 class Bin:
     def __init__(self, width, height):
@@ -34,6 +35,36 @@ def load_data(data_folder='data', bins_filename='bins.csv', flowers_filename='fl
             flowers.append(Flower(width, height))
     
     return bins, flowers
+
+def convert_data_to_matrices(loaded_bins, loaded_flowers):
+    # Create the lists with height and width of flowers and bins
+    bins_width = []
+    bins_height = []
+    for bin in loaded_bins:
+        bins_width.append(bin.width)
+        bins_height.append(bin.height)
+    bins = [bins_width, bins_height]
+
+    flowers_width = []
+    flowers_height = []
+    for flower in loaded_flowers:
+        flowers_width.append(flower.width)
+        flowers_height.append(flower.height)
+    flowers = [flowers_width, flowers_height]
+
+    # Create the pool
+    bins_matrices = []
+    flowers_pools = []
+
+    for width, height in zip(bins_width, bins_height):
+        bin = np.zeros((width, height))
+        bins_matrices.append(bin)
+
+    for width, height in zip(flowers_width, flowers_height):
+        flower = np.ones((width, height))
+        flowers_pools.append(flower)
+    
+    return bins_matrices, flowers_pools
 
 def print_data(bins, flowers):
     print("\nLoaded Bins:")
