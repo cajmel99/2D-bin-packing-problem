@@ -1,6 +1,7 @@
 from loader import load_data, convert_data_to_matrices
-import random
 from load_data import bins_matrices, flowers_pools
+from evaluate_fitness import evaluate
+import random
 import numpy as np
 #from TS import evaluate_solution
 
@@ -15,7 +16,7 @@ def can_fit(large_matrix, start_row, start_col, block_rows, block_cols):
 
 def put_flower(large_matrix, small_matrix):
     """
-    Put flower into bin 
+    Put flower into bin
     """
     large_rows, large_cols = large_matrix.shape
     small_rows, small_cols = small_matrix.shape
@@ -35,25 +36,31 @@ def random_algorith2(bins_matrices, flowers_matrices):
     remaining_flowers = flowers_matrices[:]
 
     while len(remaining_flowers) > 0:
-        print("Number of remaining flowers", len(remaining_flowers))
+        print("===================================")
+        print("|-> Remaining flowers count: ", len(remaining_flowers))
+
         flower = random.choice(remaining_flowers)
-        placed = False 
+        placed = False
         bin = random.choice(bins_matrices)
+
         while not placed:
             placed, updated_bin = put_flower(bin, flower)
-            print(f"Bin matrix shape: {updated_bin.shape}")
-            print(f"Trying to place flower of shape: {flower.shape}")
+
+            print(f"|--> Bin matrix shape: {updated_bin.shape}")
+            print(f"|--> Trying to place flower of shape: {flower.shape}")
+
             if placed:
                 for index, flower2 in enumerate(remaining_flowers):
                     if np.array_equal(flower, flower2):
-                        print(index)
+                        print(f"|---> Used flower index: ", index)
                         remaining_flowers.pop(index)
                 # Update bin
                 for index, bin2 in enumerate(remaining_flowers):
                     if np.array_equal(bin, bin2):
-                        print(index)
+                        print(f"|---> Used bin index: ", index)
                         bins_matrices[index] = updated_bin
-                print("Small matrix placed successfully:\n", updated_bin)
+
+                print("|--> Updated bin:\n", updated_bin)
             else:
                 bin = random.choice(bins_matrices)
 
@@ -66,8 +73,9 @@ def evaluate_solution(bins_matrices):
     total_free_space = sum(np.sum(bin_matrix == 0) for bin_matrix in bins_matrices if np.any(bin_matrix != 0))
     return num_bins_used, total_free_space
 
-placed = random_algorith2(bins_matrices, flowers_pools)
-print(placed)
-
-results = evaluate_solution(bins_matrices)
+results = random_algorith2(bins_matrices, flowers_pools)
 print(results)
+
+print(f"Number of used bins: ", len(results))
+final_fitness = evaluate(results, True)
+print("Final fitness: ", final_fitness)
