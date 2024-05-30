@@ -5,8 +5,8 @@ import random
 import numpy as np
 #from TS import evaluate_solution
 
-oaded_bins, loaded_flowers = load_data()
-bins_matrices, flowers_pools = convert_data_to_matrices()
+loaded_bins, loaded_flowers = load_data()
+bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
 
 def can_fit(large_matrix, start_row, start_col, block_rows, block_cols):
     """

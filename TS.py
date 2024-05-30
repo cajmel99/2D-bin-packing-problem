@@ -4,7 +4,7 @@ from loader import load_data, convert_data_to_matrices
 from RA import random_algorith2, bins_matrices, flowers_pools, can_fit, put_flower
 
 loaded_bins, loaded_flowers = load_data()
-bins_matrices, flowers_pools = convert_data_to_matrices()
+bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
 
 def evaluate_solution(bins_matrices):
     # Primary criterion: number of bins used
@@ -34,30 +34,30 @@ def tabu_search(bins_matrices, flowers_matrices, max_iter=10, tabu_tenure=10):
     current_solution = bins_matrices.copy()
     best_solution = current_solution.copy()
     best_score = evaluate_solution(current_solution)
-    
+
     tabu_list = []
-    
+
     for iteration in range(max_iter):
         neighbors = generate_neighbors(current_solution, flowers_matrices)
         neighbors = [neighbor for neighbor in neighbors if not is_in_tabu_list(neighbor, tabu_list)]
-        
+
         if not neighbors:
             break
-        
+
         best_neighbor = min(neighbors, key=evaluate_solution)
         best_neighbor_score = evaluate_solution(best_neighbor)
-        
+
         if best_neighbor_score < best_score:
             best_solution = best_neighbor.copy()
             best_score = best_neighbor_score
-        
+
         current_solution = best_neighbor
         tabu_list.append(current_solution)
         if len(tabu_list) > tabu_tenure:
             tabu_list.pop(0)
-        
+
         print(f"Iteration {iteration}, Best score: {best_score}")
-    
+
     return best_solution
 
 

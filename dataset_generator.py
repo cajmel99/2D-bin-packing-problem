@@ -36,14 +36,14 @@ def generate_dataset(num_bins, bin_min_width, bin_max_width, bin_min_height, bin
 
 def save_to_csv(bins, flowers, data_folder='data', bins_filename='bins.csv', flowers_filename='flowers.csv'):
     os.makedirs(data_folder, exist_ok=True)
-    
+
     bins_path = os.path.join(data_folder, bins_filename)
     with open(bins_path, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Bin width', 'Bin height'])
         for bin in bins:
             writer.writerow([bin.width, bin.height])
-    
+
     flowers_path = os.path.join(data_folder, flowers_filename)
     with open(flowers_path, mode='w', newline='') as file:
         writer = csv.writer(file)
