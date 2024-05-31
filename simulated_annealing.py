@@ -1,8 +1,11 @@
 from loader import load_data, convert_data_to_matrices
 from load_data import bins_matrices, flowers_pools
-from evaluate_fitness import evaluate
+from evaluate_fitness import evaluate, evaluate_bins
 import random
+import math
 import numpy as np
+import copy
+import time
 
 
 class PutFlower:
@@ -88,76 +91,82 @@ def random_search(packed_bins, flowers_matrices):
 
 
 def move_flower(bins):
-    for index, bin in enumerate(bins):
-        # print(f"BIN[{index}] rep:\n", bin.representation.astype(int))
-        for flower in bin.flowers:
-            # print(f"\n\n> BIN[{index}] - Flower rep: {flower.representation.shape}, x: {flower.x_coord}, y: {flower.y_coord}")
+    source_bin, target_bin = random.sample(bins, 2)
+    no_progress = 0
 
-            bin_xd = random.choice(bins)
+    while True:
+        while not source_bin.flowers:
+            source_bin = random.choice(bins)
+        flower = random.choice(source_bin.flowers)
 
-            large_rows, large_cols = bin_xd.representation.shape
-            small_rows, small_cols = flower.representation.shape
+        target_rows, target_cols = target_bin.representation.shape
+        flower_rows, flower_cols = flower.representation.shape
 
-            found = False
+        found = False
 
-            for i in range(large_rows - small_rows + 1):
-                for j in range(large_cols - small_cols + 1):
-                    if can_fit(bin_xd.representation, i, j, small_rows, small_cols):
-                        # Place the small matrix into the large matrix
-                        # print(f">> CAN_FIT! - BIN[{bin_xd.index}], x: {j}, y: {i}")
-                        # print(f">>>> BEFORE:\n")
-                        # print(f">>>>>>> SOURCE:\n", bin.representation.astype(int))
-                        # print(f">>>>>>> DESTINATION:\n", bin_xd.representation.astype(int))
+        if no_progress > 10:
+            target_bin = random.choice(bins)
+            no_progress = 0
 
-                        bin.representation[flower.y_coord:flower.y_coord+small_rows, flower.x_coord:flower.x_coord+small_cols] = 0
-                        bin.flowers.remove(flower)
-                        bin_xd.representation[i:i+small_rows, j:j+small_cols] = 1
-                        flower.x_coord = j
-                        flower.y_coord = i
-                        bin_xd.flowers.append(flower)
+        for i in range(target_rows - flower_rows + 1):
+            for j in range(target_cols - flower_cols + 1):
+                if can_fit(target_bin.representation, i, j, flower_rows, flower_cols):
+                    source_bin.representation[flower.y_coord:flower.y_coord+flower_rows, flower.x_coord:flower.x_coord+flower_cols] = 0
+                    source_bin.flowers.remove(flower)
 
-                        # print(f">>>> AFTER:\n")
-                        # print(f">>>>>>> SOURCE:\n", bin.representation.astype(int))
-                        # print(f">>>>>>> DESTINATION:\n", bin_xd.representation.astype(int))
+                    target_bin.representation[i:i+flower_rows, j:j+flower_cols] = 1
+                    flower.x_coord = j
+                    flower.y_coord = i
 
-                        found = True
-                        break
-
-                if found:
+                    target_bin.flowers.append(flower)
+                    found = True
                     break
+            if found:
+                return bins
+
+        no_progress += 1
 
 
+def simulated_annealing():
+    cooling_rate = 0.9999
+    current_temperature = 1000000
+    best_solution = random_search(packed_bins, flowers_pools)
+    best_fitness = evaluate_bins(best_solution)
 
-##########################################################
+    start = time.time()
+    print("\n\n================= SIMULATED ANNEALING =================")
+    print(f"\n|----> Starting fitness: {best_fitness}\n")
 
-results = random_search(packed_bins, flowers_pools)
-print(f"Number of used bins: ", len(results))
+    for i in range(500000):
+        neighbour_solution = move_flower(copy.deepcopy(best_solution))
+        neighbour_fitness = evaluate_bins(neighbour_solution)
 
-fields = []
-for bin in results:
-    fields.append(bin.representation)
+        fitness_diff = neighbour_fitness - best_fitness
+        probability = random.uniform(0, 1)
+        exponent = math.exp((fitness_diff) / current_temperature)
+
+        if i % 10000 == 0:
+            print(f"|----> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
+            print(f"diff: {fitness_diff}, probability: {probability}, exponent: {exponent}, temperature: {current_temperature}")
+
+        if fitness_diff > 0:
+            best_solution = neighbour_solution
+            best_fitness = neighbour_fitness
+        else:
+            if probability < exponent:
+                best_solution = neighbour_solution
+                best_fitness = neighbour_fitness
+
+        current_temperature *= cooling_rate
+
+    final_result = evaluate_bins(best_solution)
+    end = time.time()
+    elapsed = end - start
+
+    print(f"\n|----> Final result: {final_result}, found in: {elapsed}s")
+    print("\n\n=======================================================")
+
+    return final_result
 
 
-print(f">>>>>>>>>>>>> BEFORE MOVE <<<<<<<<<<<<<<")
-
-for index, bin in enumerate(results):
-    print(f"BIN[{index}] rep:\n", bin.representation.astype(int))
-    for flower in bin.flowers:
-        print(f"BIN[{index}] - Flower rep: {flower.representation.shape}, x: {flower.x_coord}, y: {flower.y_coord}")
-
-final_fitness = evaluate(fields, True)
-print("Final fitness: ", final_fitness)
-
-
-move_flower(results)
-
-
-print(f">>>>>>>>>>>>> AFTER MOVE <<<<<<<<<<<<<<")
-
-for index, bin in enumerate(results):
-    print(f"BIN[{index}] rep:\n", bin.representation.astype(int))
-    for flower in bin.flowers:
-        print(f"BIN[{index}] - Flower rep: {flower.representation.shape}, x: {flower.x_coord}, y: {flower.y_coord}")
-
-final_fitness = evaluate(fields, True)
-print("Final fitness: ", final_fitness)
+simulated_annealing()
