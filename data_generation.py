@@ -1,10 +1,10 @@
 from dataset_generator import *
 
 num_bins = 5
-bin_min_width = 100
-bin_max_width = 200
-bin_min_height = 100
-bin_max_height = 200
+bin_min_width = 108
+bin_max_width = 108
+bin_min_height = 118
+bin_max_height = 118
 
 num_flowers = 20
 flower_min_width = 10

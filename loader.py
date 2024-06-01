@@ -11,6 +11,9 @@ class Flower:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+            
+    def __repr__(self) -> str:
+        return f"({self.width}, {self.height})"
 
 def load_data(data_folder='data', bins_filename='bins2.csv', flowers_filename='flowers2.csv'):
     bins = []
