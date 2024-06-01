@@ -77,11 +77,11 @@ def algorithm_HBF(flowers, bins):
     return bins
 
 
+if __name__ == "__main__":
+    loaded_bins, loaded_flowers = load_data(bins_filename='bins2.csv', flowers_filename='flowers2.csv')
+    results = algorithm_HBF(loaded_flowers, loaded_bins)
 
-loaded_bins, loaded_flowers = load_data(bins_filename='bins2.csv', flowers_filename='flowers2.csv')
-results = algorithm_HBF(loaded_flowers, loaded_bins)
+    from evaluate_fitness import evaluate
 
-from evaluate_fitness import evaluate
-
-x = evaluate([bin.matrix for bin in results], False)
-print(x)
+    x = evaluate([bin.matrix for bin in results], False)
+    print(x)

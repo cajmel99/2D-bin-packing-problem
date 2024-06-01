@@ -122,9 +122,27 @@ class GeneticAlgorithm:
                 j = random.choice([x for x in range(len(chromosome.genes)) if x != i])
                 chromosome.genes[i], chromosome.genes[j] = chromosome.genes[j], chromosome.genes[i]
 
-    def crossover(self, parent1:Chromosome, parent2: Chromosome):
-        #TODO!!!!!!!!!!!!
-        return parent1, parent2
+    def crossover(self, parent1: Chromosome, parent2: Chromosome, child1: Chromosome, child2: Chromosome):
+        if random.random() < self.config.mutation_rate:
+            size = len(parent1.genes)
+            child1.genes, child2.genes = [None]*size, [None]*size
+
+            start, end = sorted(random.sample(range(size), 2))
+
+            child1.genes[start:end] = parent1.genes[start:end]
+            child2.genes[start:end] = parent2.genes[start:end]
+
+            def fill_child(child, parent):
+                p = 0
+                for i in range(size):
+                    if not child[i]:
+                        while parent[p] in child:
+                            p += 1
+                        child[i] = parent[p]
+
+            fill_child(child1.genes, parent2.genes)
+            fill_child(child2.genes, parent1.genes)
+        
 
     def evolve(self):
         children = []
@@ -135,7 +153,7 @@ class GeneticAlgorithm:
             child1 = copy.deepcopy(parent1)
             child2 = copy.deepcopy(parent2)
 
-            child1, child2 = self.crossover(parent1, parent2)
+            self.crossover(parent1, parent2, child1, child2)
             self.swap_mutate(child1)
             self.swap_mutate(child2)
 
@@ -196,18 +214,18 @@ class GeneticAlgorithm:
             writer.writerows(self.results)
 
 
+if __name__ == "__main__":
+    genetic_config = AlgorithmConfig(
+        population_size=120,
+        generations=200,
+        mutation_rate=0.025,
+        crossover_rate=0.25,
+        tournament_size = 4,
+        flowers_file="flowers2.csv",
+        results_file="genetic_results.csv",
+        bins_file="bins2.csv",
+    )
 
-genetic_config = AlgorithmConfig(
-    population_size=50,
-    generations=40,
-    mutation_rate=0.05,
-    crossover_rate=0.3,
-    tournament_size = 2,
-    flowers_file="flowers2.csv",
-    results_file="genetic_results.csv",
-    bins_file="bins2.csv",
-)
-
-genetic_algorithm = GeneticAlgorithm(genetic_config)
-genetic_algorithm.load_data()
-genetic_algorithm.run()
+    genetic_algorithm = GeneticAlgorithm(genetic_config)
+    genetic_algorithm.load_data()
+    genetic_algorithm.run()

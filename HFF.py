@@ -88,10 +88,11 @@ def algorithm_HFF(flowers:list[Flower], bins:list[Bin]):
 
     return bins
 
-loaded_bins, loaded_flowers = load_data(bins_filename='bins2.csv', flowers_filename='flowers2.csv')
-results = algorithm_HFF(loaded_flowers, loaded_bins)
+if __name__ == "__main__":
+    loaded_bins, loaded_flowers = load_data(bins_filename='bins2.csv', flowers_filename='flowers2.csv')
+    results = algorithm_HFF(loaded_flowers, loaded_bins)
 
-from evaluate_fitness import evaluate
+    from evaluate_fitness import evaluate
 
-x = evaluate([bin.matrix for bin in results], False)
-print(x)
+    x = evaluate([bin.matrix for bin in results], False)
+    print(x)
