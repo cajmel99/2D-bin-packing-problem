@@ -34,7 +34,7 @@ def generate_dataset(num_bins, bin_max_width, bin_max_height,
     flowers = generate_random_flowers(num_flowers, flower_min_width, flower_max_width, flower_min_height, flower_max_height)
     return bins, flowers
 
-def save_to_csv(bins, flowers, data_folder='data', bins_filename='bins2.csv', flowers_filename='flowers2.csv'):
+def save_to_csv(bins, flowers, data_folder, bins_filename, flowers_filename):
     os.makedirs(data_folder, exist_ok=True)
 
     bins_path = os.path.join(data_folder, bins_filename)
