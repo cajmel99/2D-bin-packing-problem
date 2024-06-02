@@ -12,11 +12,11 @@ class Flower:
         self.width = width
         self.height = height
 
-def generate_random_bins(num_bins, min_width, max_width, min_height, max_height):
+def generate_random_bins(num_bins, max_width, max_height):
     bins = []
     for _ in range(num_bins):
-        width = random.randint(min_width, max_width)
-        height = random.randint(min_height, max_height)
+        width = max_width #random.randint(min_width, max_width)
+        height = max_height #random.randint(min_height, max_height)
         bins.append(Bin(width, height))
     return bins
 
@@ -28,9 +28,9 @@ def generate_random_flowers(num_flowers, min_width, max_width, min_height, max_h
         flowers.append(Flower(width, height))
     return flowers
 
-def generate_dataset(num_bins, bin_min_width, bin_max_width, bin_min_height, bin_max_height,
+def generate_dataset(num_bins, bin_max_width, bin_max_height,
                      num_flowers, flower_min_width, flower_max_width, flower_min_height, flower_max_height):
-    bins = generate_random_bins(num_bins, bin_min_width, bin_max_width, bin_min_height, bin_max_height)
+    bins = generate_random_bins(num_bins, bin_max_width, bin_max_height)
     flowers = generate_random_flowers(num_flowers, flower_min_width, flower_max_width, flower_min_height, flower_max_height)
     return bins, flowers
 
