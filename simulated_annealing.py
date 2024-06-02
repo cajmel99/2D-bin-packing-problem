@@ -1,5 +1,4 @@
 from loader import load_data, convert_data_to_matrices
-from load_data import bins_matrices, flowers_pools
 from evaluate_fitness import evaluate, evaluate_bins
 import random
 import math
@@ -131,21 +130,21 @@ def simulated_annealing():
     cooling_rate = 0.9999
     current_temperature = 1000000
     best_solution = random_search(packed_bins, flowers_pools)
-    best_fitness = evaluate_bins(best_solution)
+    best_fitness, _ = evaluate_bins(best_solution)
 
     start = time.time()
     print("\n\n================= SIMULATED ANNEALING =================")
     print(f"\n|----> Starting fitness: {best_fitness}\n")
 
-    for i in range(500000):
+    for i in range(25000):
         neighbour_solution = move_flower(copy.deepcopy(best_solution))
-        neighbour_fitness = evaluate_bins(neighbour_solution)
+        neighbour_fitness, _ = evaluate_bins(neighbour_solution)
 
         fitness_diff = neighbour_fitness - best_fitness
         probability = random.uniform(0, 1)
         exponent = math.exp((fitness_diff) / current_temperature)
 
-        if i % 10000 == 0:
+        if i % 100 == 0:
             print(f"|----> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
             print(f"diff: {fitness_diff}, probability: {probability}, exponent: {exponent}, temperature: {current_temperature}")
 
@@ -159,11 +158,15 @@ def simulated_annealing():
 
         current_temperature *= cooling_rate
 
-    final_result = evaluate_bins(best_solution)
+    final_result, non_empty_bins = evaluate_bins(best_solution, True)
     end = time.time()
     elapsed = end - start
 
-    print(f"\n|----> Final result: {final_result}, found in: {elapsed}s")
+    print(f"|----> Final bins: {final_result}")
+    for bin in best_solution:
+        if np.all(bin.representation == 0):
+            print(f"BIN[{bin.index}]:\n{bin.representation}")
+    print(f"\n|----> Final result: {final_result}, used bins: {non_empty_bins}, found in: {elapsed}s")
     print("\n\n=======================================================")
 
     return final_result
