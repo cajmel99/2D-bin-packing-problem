@@ -127,7 +127,7 @@ def move_flower(bins):
 
 
 def simulated_annealing():
-    cooling_rate = 0.9999
+    cooling_rate = 0.999
     current_temperature = 1000000
     best_solution = random_search(packed_bins, flowers_pools)
     best_fitness, _ = evaluate_bins(best_solution)
@@ -136,13 +136,13 @@ def simulated_annealing():
     print("\n\n================= SIMULATED ANNEALING =================")
     print(f"\n|----> Starting fitness: {best_fitness}\n")
 
-    for i in range(25000):
+    for i in range(50000):
         neighbour_solution = move_flower(copy.deepcopy(best_solution))
         neighbour_fitness, _ = evaluate_bins(neighbour_solution)
 
         fitness_diff = neighbour_fitness - best_fitness
         probability = random.uniform(0, 1)
-        exponent = math.exp((fitness_diff) / current_temperature)
+        exponent = np.exp((fitness_diff) / current_temperature)
 
         if i % 100 == 0:
             print(f"|----> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
@@ -164,7 +164,7 @@ def simulated_annealing():
 
     print(f"|----> Final bins: {final_result}")
     for bin in best_solution:
-        if np.all(bin.representation == 0):
+        if np.count_nonzero(bin.representation == 1) != 0:
             print(f"BIN[{bin.index}]:\n{bin.representation}")
     print(f"\n|----> Final result: {final_result}, used bins: {non_empty_bins}, found in: {elapsed}s")
     print("\n\n=======================================================")
