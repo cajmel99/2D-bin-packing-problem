@@ -1,6 +1,7 @@
 import csv
 import os
 import numpy as np
+import random
 
 class Bin:
     def __init__(self, width, height):
@@ -11,9 +12,15 @@ class Flower:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.unique_hash = hash((self.width, self.height, random.random()))
             
     def __repr__(self) -> str:
         return f"({self.width}, {self.height})"
+    
+    def __eq__(self, other):
+        if isinstance(other, Flower):
+            return self.unique_hash == other.unique_hash
+        return False
 
 def load_data(data_folder='data', bins_filename='bins2.csv', flowers_filename='flowers2.csv'):
     bins = []

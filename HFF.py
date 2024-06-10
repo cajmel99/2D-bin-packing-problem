@@ -1,6 +1,7 @@
 from loader import load_data, print_data, Bin, Flower
 # from load_data import bins_matrices, flowers_pools
 import numpy as np
+import matplotlib.pyplot as plt
     
 class Block:
     def __init__(self, width, height):
@@ -89,10 +90,32 @@ def algorithm_HFF(flowers:list[Flower], bins:list[Bin]):
     return bins
 
 if __name__ == "__main__":
-    loaded_bins, loaded_flowers = load_data(bins_filename='bins2.csv', flowers_filename='flowers2.csv')
+    loaded_bins, loaded_flowers = load_data(bins_filename='count100bins/size10/size10bins.csv', flowers_filename='count100bins/size10/count50flowers.csv')
+        
+    heights = [f.height for f in loaded_flowers]
+    areas = [f.height*f.width for f in loaded_flowers]
     results = algorithm_HFF(loaded_flowers, loaded_bins)
+
+    # Tworzenie histogramów z większą liczbą przedziałów (np. 20)
+    fig, axs = plt.subplots(2, 1, figsize=(10, 8))
+
+    # Histogram dla pól powierzchni
+    axs[0].hist(areas, bins=20, color='skyblue', edgecolor='black')
+    axs[0].set_title('Histogram pól powierzchni elementów')
+    axs[0].set_xlabel('Pole powierzchni')
+    axs[0].set_ylabel('Częstotliwość')
+
+    # Histogram dla wysokości
+    axs[1].hist(heights, bins=20, color='lightgreen', edgecolor='black')
+    axs[1].set_title('Histogram wysokości elementów')
+    axs[1].set_xlabel('Wysokość')
+    axs[1].set_ylabel('Częstotliwość')
+
+    plt.tight_layout()
+    plt.show()
+
 
     from evaluate_fitness import evaluate
 
-    x = evaluate([bin.matrix for bin in results], False)
+    x = evaluate([bin.matrix for bin in results], True)
     print(x)
