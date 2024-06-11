@@ -13,10 +13,10 @@ DATA_PATH = 'data/'
 BIN_SIZE_PATH = 'size50/'
 BINS_PATH = BIN_SIZE_PATH + 'size50bins.csv'
 
-FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count150flowers/'
-FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count150flowers1.csv'
+FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count100flowers/'
+FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count100flowers1.csv'
 
-IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count150flowers1.pdf'
+IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count100flowers.pdf'
 
 COOLING_RATE = 0.999
 STARTING_TEMPERATURE = 1000000
@@ -197,6 +197,9 @@ def simulated_annealing(max_iterations=MAX_ITERATIONS, starting_temperature=STAR
 
 simulated_annealing()
 
+plt.xlabel('Temperatura')
+plt.ylabel('Wartość przystosowania')
+plt.title('Grządki 50x50, 100 kwiatków')
 plt.plot(temperatures, fitnesses)
 plt.xscale('log')
 plt.grid(True)
