@@ -13,10 +13,10 @@ class Flower:
         self.width = width
         self.height = height
         self.unique_hash = hash((self.width, self.height, random.random()))
-            
+
     def __repr__(self) -> str:
         return f"({self.width}, {self.height})"
-    
+
     def __eq__(self, other):
         if isinstance(other, Flower):
             return self.unique_hash == other.unique_hash

@@ -5,6 +5,24 @@ import math
 import numpy as np
 import copy
 import time
+import matplotlib.pyplot as plt
+
+#################################
+DATA_PATH = 'data/'
+
+BIN_SIZE_PATH = 'size50/'
+BINS_PATH = BIN_SIZE_PATH + 'size50bins.csv'
+
+FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count150flowers/'
+FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count150flowers1.csv'
+
+IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count150flowers1.pdf'
+
+COOLING_RATE = 0.999
+STARTING_TEMPERATURE = 1000000
+PRINTING_STEP = 100
+MAX_ITERATIONS = 50000
+#################################
 
 
 class PutFlower:
@@ -20,7 +38,7 @@ class PackedBin:
         self.flowers = []
 
 
-loaded_bins, loaded_flowers = load_data()
+loaded_bins, loaded_flowers = load_data(data_folder='data', bins_filename=BINS_PATH, flowers_filename=FLOWERS_PATH)
 bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
 
 packed_bins = []
@@ -126,9 +144,11 @@ def move_flower(bins):
         no_progress += 1
 
 
-def simulated_annealing():
-    cooling_rate = 0.999
-    current_temperature = 1000000
+temperatures = []
+fitnesses = []
+
+def simulated_annealing(max_iterations=MAX_ITERATIONS, starting_temperature=STARTING_TEMPERATURE, cooling_rate=COOLING_RATE):
+    current_temperature = starting_temperature
     best_solution = random_search(packed_bins, flowers_pools)
     best_fitness, _ = evaluate_bins(best_solution)
 
@@ -136,7 +156,7 @@ def simulated_annealing():
     print("\n\n================= SIMULATED ANNEALING =================")
     print(f"\n|----> Starting fitness: {best_fitness}\n")
 
-    for i in range(50000):
+    for i in range(max_iterations):
         neighbour_solution = move_flower(copy.deepcopy(best_solution))
         neighbour_fitness, _ = evaluate_bins(neighbour_solution)
 
@@ -144,7 +164,7 @@ def simulated_annealing():
         probability = random.uniform(0, 1)
         exponent = np.exp((fitness_diff) / current_temperature)
 
-        if i % 100 == 0:
+        if i % PRINTING_STEP == 0:
             print(f"|----> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
             print(f"diff: {fitness_diff}, probability: {probability}, exponent: {exponent}, temperature: {current_temperature}")
 
@@ -155,6 +175,9 @@ def simulated_annealing():
             if probability < exponent:
                 best_solution = neighbour_solution
                 best_fitness = neighbour_fitness
+
+        temperatures.append(current_temperature)
+        fitnesses.append(best_fitness)
 
         current_temperature *= cooling_rate
 
@@ -173,3 +196,9 @@ def simulated_annealing():
 
 
 simulated_annealing()
+
+plt.plot(temperatures, fitnesses)
+plt.xscale('log')
+plt.grid(True)
+plt.gca().invert_xaxis()
+plt.savefig(IMAGE_PATH)
