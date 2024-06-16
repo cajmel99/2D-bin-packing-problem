@@ -8,22 +8,23 @@ import time
 import matplotlib.pyplot as plt
 
 #################################
+
 DATA_PATH = 'data/'
 
-BIN_SIZE_PATH = 'size50/'
-BINS_PATH = BIN_SIZE_PATH + 'size50bins.csv'
+BIN_SIZE_PATH = 'size10/'
+BINS_PATH = BIN_SIZE_PATH + 'size10bins.csv'
 
-FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count100flowers/'
-FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count100flowers1.csv'
+FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count50flowers/'
+FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count50flowers1.csv'
 
-IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count100flowers.pdf'
+IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count50flowers.pdf'
 
-COOLING_RATE = 0.999
-STARTING_TEMPERATURE = 1000000
+COOLING_RATE = 0.9995
+STARTING_TEMPERATURE = 500000
 PRINTING_STEP = 100
 MAX_ITERATIONS = 50000
-#################################
 
+#################################
 
 class PutFlower:
     def __init__(self, representation, x_coord, y_coord):
@@ -37,48 +38,40 @@ class PackedBin:
         self.representation = representation
         self.flowers = []
 
+class PlotData:
+    def __init__(self):
+        self.temperatures = []
+        self.fitnesses = []
 
-loaded_bins, loaded_flowers = load_data(data_folder='data', bins_filename=BINS_PATH, flowers_filename=FLOWERS_PATH)
-bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
-
-packed_bins = []
-
-for index, matrix in enumerate(bins_matrices):
-    packed_bins.append(PackedBin(index, matrix))
-
+#################################
 
 def can_fit(large_matrix, start_row, start_col, block_rows, block_cols):
-    """
-    Check if the bin have enough free space to put flower
-    """
     return np.all(large_matrix[start_row:start_row+block_rows, start_col:start_col+block_cols] == 0)
 
+
 def put_flower(bin, small_matrix):
-    """
-    Put flower into bin
-    """
     large_rows, large_cols = bin.representation.shape
     small_rows, small_cols = small_matrix.shape
     placed = False
+
     for i in range(large_rows - small_rows + 1):
         for j in range(large_cols - small_cols + 1):
             if can_fit(bin.representation, i, j, small_rows, small_cols):
-                # Place the small matrix into the large matrix
                 bin.representation[i:i+small_rows, j:j+small_cols] = small_matrix
                 bin.flowers.append(PutFlower(small_matrix, j, i))
                 placed = True
                 break
+
         if placed:
             break
+
     return placed, bin
+
 
 def random_search(packed_bins, flowers_matrices):
     remaining_flowers = flowers_matrices[:]
 
     while len(remaining_flowers) > 0:
-        print("===================================")
-        print("|-> Remaining flowers count: ", len(remaining_flowers))
-
         flower = random.choice(remaining_flowers)
         placed = False
         bin = random.choice(packed_bins)
@@ -86,26 +79,19 @@ def random_search(packed_bins, flowers_matrices):
         while not placed:
             placed, updated_bin = put_flower(bin, flower)
 
-            print(f"|--> Bin matrix shape: {updated_bin.representation.shape}")
-            print(f"|--> Trying to place flower of shape: {flower.shape}")
-
             if placed:
                 for index, flower2 in enumerate(remaining_flowers):
                     if np.array_equal(flower, flower2):
-                        print(f"|---> Used flower index: ", index)
                         remaining_flowers.pop(index)
-                # Update bin
                 for index, bin2 in enumerate(packed_bins):
                     if np.array_equal(bin.representation, bin2.representation):
-                        print(f"|---> Used bin index: ", index)
                         packed_bins[index].representation = updated_bin.representation
-
-                print("|--> Updated bin:\n", updated_bin.representation)
             else:
                 bin = random.choice(packed_bins)
 
     return packed_bins
 
+#################################
 
 def move_flower(bins):
     source_bin, target_bin = random.sample(bins, 2)
@@ -143,11 +129,21 @@ def move_flower(bins):
 
         no_progress += 1
 
+def simulated_annealing(
+    plot_data,
+    max_iterations=MAX_ITERATIONS,
+    starting_temperature=STARTING_TEMPERATURE,
+    cooling_rate=COOLING_RATE):
 
-temperatures = []
-fitnesses = []
+    loaded_bins, loaded_flowers = load_data(
+        data_folder='data', bins_filename=BINS_PATH, flowers_filename=FLOWERS_PATH)
+    bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
 
-def simulated_annealing(max_iterations=MAX_ITERATIONS, starting_temperature=STARTING_TEMPERATURE, cooling_rate=COOLING_RATE):
+    packed_bins = []
+
+    for index, matrix in enumerate(bins_matrices):
+        packed_bins.append(PackedBin(index, matrix))
+
     current_temperature = starting_temperature
     best_solution = random_search(packed_bins, flowers_pools)
     best_fitness, _ = evaluate_bins(best_solution)
@@ -176,8 +172,8 @@ def simulated_annealing(max_iterations=MAX_ITERATIONS, starting_temperature=STAR
                 best_solution = neighbour_solution
                 best_fitness = neighbour_fitness
 
-        temperatures.append(current_temperature)
-        fitnesses.append(best_fitness)
+        plot_data.temperatures.append(current_temperature)
+        plot_data.fitnesses.append(best_fitness)
 
         current_temperature *= cooling_rate
 
@@ -185,23 +181,23 @@ def simulated_annealing(max_iterations=MAX_ITERATIONS, starting_temperature=STAR
     end = time.time()
     elapsed = end - start
 
-    print(f"|----> Final bins: {final_result}")
-    for bin in best_solution:
-        if np.count_nonzero(bin.representation == 1) != 0:
-            print(f"BIN[{bin.index}]:\n{bin.representation}")
     print(f"\n|----> Final result: {final_result}, used bins: {non_empty_bins}, found in: {elapsed}s")
     print("\n\n=======================================================")
 
-    return final_result
+    return final_result, non_empty_bins, elapsed
 
+#################################
 
-simulated_annealing()
+if __name__ == "__main__":
+    plot_data = PlotData()
 
-plt.xlabel('Temperatura')
-plt.ylabel('Wartość przystosowania')
-plt.title('Grządki 50x50, 100 kwiatków')
-plt.plot(temperatures, fitnesses)
-plt.xscale('log')
-plt.grid(True)
-plt.gca().invert_xaxis()
-plt.savefig(IMAGE_PATH)
+    sim_result = simulated_annealing(plot_data)
+
+    plt.xlabel('Temperatura')
+    plt.ylabel('Wartość przystosowania')
+    plt.title('Grządki 10x10, 50 kwiatków')
+    plt.plot(plot_data.temperatures, plot_data.fitnesses)
+    plt.xscale('log')
+    plt.grid(True)
+    plt.gca().invert_xaxis()
+    plt.savefig(IMAGE_PATH)
