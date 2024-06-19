@@ -9,20 +9,24 @@ import matplotlib.pyplot as plt
 
 #################################
 
+BIN_SIZE = '10'
+FLOWERS_COUNT = '50'
+
 DATA_PATH = 'data/'
 
-BIN_SIZE_PATH = 'size10/'
-BINS_PATH = BIN_SIZE_PATH + 'size10bins.csv'
+BIN_SIZE_DIR = 'size' + BIN_SIZE + '/'
+DEFAULT_BINS_PATH = BIN_SIZE_DIR + 'size' + BIN_SIZE + 'bins.csv'
 
-FLOWERS_COUNT_PATH = BIN_SIZE_PATH + 'count50flowers/'
-FLOWERS_PATH = FLOWERS_COUNT_PATH + 'count50flowers1.csv'
+FLOWERS_COUNT_DIR = BIN_SIZE_DIR + 'count' + FLOWERS_COUNT + 'flowers/'
+DEFAULT_FLOWERS_PATH = FLOWERS_COUNT_DIR + 'count' + FLOWERS_COUNT + 'flowers2.csv'
 
-IMAGE_PATH = DATA_PATH + FLOWERS_COUNT_PATH + 'count50flowers.pdf'
+RESULT_FILE_PATH = 'sa_results/last_run.txt'
+PLOT_PATH = 'sa_results/last_run_plot.pdf'
 
 COOLING_RATE = 0.9995
 STARTING_TEMPERATURE = 500000
-PRINTING_STEP = 100
 MAX_ITERATIONS = 50000
+PRINTING_STEP = 100
 
 #################################
 
@@ -130,13 +134,10 @@ def move_flower(bins):
         no_progress += 1
 
 def simulated_annealing(
-    plot_data,
-    max_iterations=MAX_ITERATIONS,
-    starting_temperature=STARTING_TEMPERATURE,
-    cooling_rate=COOLING_RATE):
+    plot_data, bins_path, flowers_path, max_iterations, starting_temperature, cooling_rate):
 
     loaded_bins, loaded_flowers = load_data(
-        data_folder='data', bins_filename=BINS_PATH, flowers_filename=FLOWERS_PATH)
+        data_folder=DATA_PATH, bins_filename=bins_path, flowers_filename=flowers_path)
     bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
 
     packed_bins = []
@@ -150,7 +151,7 @@ def simulated_annealing(
 
     start = time.time()
     print("\n\n================= SIMULATED ANNEALING =================")
-    print(f"\n|----> Starting fitness: {best_fitness}\n")
+    print(f"\n|-> Starting fitness: {best_fitness}\n")
 
     for i in range(max_iterations):
         neighbour_solution = move_flower(copy.deepcopy(best_solution))
@@ -161,7 +162,7 @@ def simulated_annealing(
         exponent = np.exp((fitness_diff) / current_temperature)
 
         if i % PRINTING_STEP == 0:
-            print(f"|----> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
+            print(f"|-> Iteration {i}, best fitness: {best_fitness}, neighbour fitness: {neighbour_fitness},", end=' ')
             print(f"diff: {fitness_diff}, probability: {probability}, exponent: {exponent}, temperature: {current_temperature}")
 
         if fitness_diff > 0:
@@ -181,23 +182,41 @@ def simulated_annealing(
     end = time.time()
     elapsed = end - start
 
-    print(f"\n|----> Final result: {final_result}, used bins: {non_empty_bins}, found in: {elapsed}s")
+    print(f"\n|--> Final result: {final_result}, used bins: {non_empty_bins}, found in: {elapsed}s")
     print("\n\n=======================================================")
 
     return final_result, non_empty_bins, elapsed
 
 #################################
 
-if __name__ == "__main__":
+def solve_sa(
+    bins_path=DEFAULT_BINS_PATH,
+    flowers_path=DEFAULT_FLOWERS_PATH,
+    max_iterations=MAX_ITERATIONS,
+    starting_temperature=STARTING_TEMPERATURE,
+    cooling_rate=COOLING_RATE):
+
     plot_data = PlotData()
 
-    sim_result = simulated_annealing(plot_data)
+    sim_result = simulated_annealing(
+        plot_data, bins_path, flowers_path, max_iterations, starting_temperature, cooling_rate)
+    file = open(RESULT_FILE_PATH, "a")
+    file.write(f'{sim_result[0]} {sim_result[1]} {sim_result[2]}\n')
+    file.close()
 
-    plt.xlabel('Temperatura')
-    plt.ylabel('Wartość przystosowania')
-    plt.title('Grządki 10x10, 50 kwiatków')
+    plt.xlabel('Temperature')
+    plt.ylabel('Fitness evaluation')
+    plt.title('Last simulated annealing run')
     plt.plot(plot_data.temperatures, plot_data.fitnesses)
     plt.xscale('log')
     plt.grid(True)
     plt.gca().invert_xaxis()
-    plt.savefig(IMAGE_PATH)
+    plt.savefig(PLOT_PATH)
+
+    print(f"\nLast run results saved at sa_results/last_run.txt(last_run_plot.pdf)")
+
+    return sim_result
+
+
+if __name__ == "__main__":
+    solve_sa()
