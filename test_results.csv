@@ -1,0 +1,5 @@
+mutation;crossover;tournament;bins;flowers;size;bins_file;results
+0.0;0.0;1;count10bins;count50flowers;size10;size10bins;(1262303.0, 20)
+0.005;0.0;1;count10bins;count50flowers;size10;size10bins;(1293530.0, 16)
+0.0;0.1;1;count10bins;count50flowers;size10;size10bins;(1284934.0, 18)
+0.005;0.1;1;count10bins;count50flowers;size10;size10bins;(1295294.0, 17)

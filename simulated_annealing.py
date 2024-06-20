@@ -1,5 +1,5 @@
-from loader import load_data, convert_data_to_matrices
-from evaluate_fitness import evaluate, evaluate_bins
+from algorithms.loader import load_data, convert_data_to_matrices
+from algorithms.evaluate_fitness import evaluate, evaluate_bins
 import random
 import math
 import numpy as np

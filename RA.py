@@ -1,6 +1,6 @@
-from loader import load_data, convert_data_to_matrices
+from algorithms.loader import load_data, convert_data_to_matrices
 from load_data import bins_matrices, flowers_pools
-from evaluate_fitness import evaluate
+from algorithms.evaluate_fitness import evaluate
 import random
 import numpy as np
 #from TS import evaluate_solution

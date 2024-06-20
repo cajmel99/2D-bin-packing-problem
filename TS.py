@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from loader import load_data, convert_data_to_matrices
+from algorithms.loader import load_data, convert_data_to_matrices
 from RA import random_algorith2, bins_matrices, flowers_pools, can_fit, put_flower
 
 loaded_bins, loaded_flowers = load_data()

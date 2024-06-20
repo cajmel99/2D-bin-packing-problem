@@ -1,4 +1,4 @@
-from loader import load_data, print_data, convert_data_to_matrices
+from algorithms.loader import load_data, print_data, convert_data_to_matrices
 import numpy as np
 
 loaded_bins, loaded_flowers = load_data()
