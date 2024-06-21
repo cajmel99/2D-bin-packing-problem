@@ -73,6 +73,9 @@ def ga_command(args):
 def greedy_command(args):
     print(f"GREEDY: source_bins={args.source_bins}, source_flowers={args.source_flowers}")
 
+def random_command(args):
+    pass
+
 def generate_data(args):
     print(f"Generate data: bins={args.bins_filename}, flowers={args.flowers_filename}")
 def create_parser():
@@ -145,6 +148,12 @@ iterations=3'''
     parser_command4.add_argument('--flower_min_height', type=int, help='Path to the second source file', required=True)
     parser_command4.add_argument('--flower_max_height', type=int, help='Path to the second source file', required=True)
     parser_command4.set_defaults(func=generate_data)
+
+    # Command 5 parser
+    parser_command5 = subparsers.add_parser('RANDOM', help='GENERATE DATA')
+    parser_command5.add_argument('--source_bins', type=str, help='Path to bins', required=True)
+    parser_command5.add_argument('--source_flowers', type=str, help='Path to flowers', required=True)
+    parser_command5.set_defaults(func=random_command)
 
     args = parser.parse_args()
     try:

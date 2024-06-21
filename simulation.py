@@ -1,5 +1,5 @@
 from arguments import create_parser
-from algorithms import run_algortihm_HFF_HBF, run_genetic_algorithm, solve_sa, generate_and_save_data
+from algorithms import run_algortihm_HFF_HBF, run_genetic_algorithm, solve_sa, generate_and_save_data, random_algorith2, evaluate
 
 if __name__ == '__main__':
     args = None
@@ -31,6 +31,12 @@ if __name__ == '__main__':
             sim_result = solve_sa(args.source_bins, args.source_flowers, int(args.iterations), int(args.temperature), float(args.cooling))
         case "GREEDY":
             run_algortihm_HFF_HBF(args.source_bins, args.source_flowers)
+        case "RANDOM":
+            results = random_algorith2(args.source_bins, args.source_flowers)
+            print(results)
+            print(f"Number of used bins: ", len(results))
+            final_fitness = evaluate(results, True)
+            print("Final fitness: ", final_fitness)
         case "GA":
             run_genetic_algorithm(
                 int(args.pop_size),
