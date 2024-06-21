@@ -142,17 +142,6 @@ def algorithm_HBF(flowers, bins):
                 current_bin_index += 1
                 used_bins.append(current_bin_index)
                 bins[current_bin_index].open_new_block(flower)
-
-    for i, flower in enumerate(flowers):
-        placed = False
-        if bins[current_bin_index].can_put_in_current_bin(flower):
-            if bins[current_bin_index].place(flower):
-                placed = True
-        if not placed:
-            if not bins[current_bin_index].open_new_block(flower):
-                current_bin_index+=1
-                bins[current_bin_index].open_new_block(flower)
-    
     return bins
 
 def run_algortihm_HFF_HBF(bins_filename_, flowers_filename_):
