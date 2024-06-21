@@ -4,8 +4,7 @@ import random
 import numpy as np
 #from TS import evaluate_solution
 
-loaded_bins, loaded_flowers = load_data()
-bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
+
 
 def can_fit(large_matrix, start_row, start_col, block_rows, block_cols):
     """
@@ -72,9 +71,12 @@ def evaluate_solution(bins_matrices):
     total_free_space = sum(np.sum(bin_matrix == 0) for bin_matrix in bins_matrices if np.any(bin_matrix != 0))
     return num_bins_used, total_free_space
 
-results = random_algorith2(bins_matrices, flowers_pools)
-print(results)
+if __name__ == "__main__":
+    loaded_bins, loaded_flowers = load_data()
+    bins_matrices, flowers_pools = convert_data_to_matrices(loaded_bins, loaded_flowers)
+    results = random_algorith2(bins_matrices, flowers_pools)
+    print(results)
 
-print(f"Number of used bins: ", len(results))
-final_fitness = evaluate(results, True)
-print("Final fitness: ", final_fitness)
+    print(f"Number of used bins: ", len(results))
+    final_fitness = evaluate(results, True)
+    print("Final fitness: ", final_fitness)
