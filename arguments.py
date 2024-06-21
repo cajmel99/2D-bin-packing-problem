@@ -80,7 +80,7 @@ def create_parser():
     subparsers = parser.add_subparsers(dest='algorith', help='Available commands')
 
     # Command 1 parser
-    parser_command1 = subparsers.add_parser('SA', help='Command 1 help', formatter_class=argparse.RawTextHelpFormatter)
+    parser_command1 = subparsers.add_parser('SA', help='Simulated annealing', formatter_class=argparse.RawTextHelpFormatter)
     parser_command1.add_argument(
         '--config',
         type=str,
@@ -91,44 +91,48 @@ iterations=50
 temperature=999
 cooling=5'''
     )
-    parser_command1.add_argument('--source_bins', type=str, help='Path to the first source file')
-    parser_command1.add_argument('--source_flowers', type=str, help='Path to the second source file')
+    parser_command1.add_argument('--source_bins', type=str, help='Path to bins')
+    parser_command1.add_argument('--source_flowers', type=str, help='Path to flowers')
     parser_command1.add_argument('--iterations', type=int, help='Number of iterations')
     parser_command1.add_argument('--temperature', type=float, help='Initial temperature')
-    parser_command1.add_argument('--cooling', type=float, help='Initial temperature')
+    parser_command1.add_argument('--cooling', type=float, help='Cooling ratio')
     parser_command1.set_defaults(func=sa_command)
 
     # Command 2 parser
-    parser_command2 = subparsers.add_parser('GREEDY', help='Command 2 help')
-    parser_command2.add_argument('--source_bins', type=str, help='Path to the first source file', required=True)
-    parser_command2.add_argument('--source_flowers', type=str, help='Path to the second source file', required=True)
+    parser_command2 = subparsers.add_parser('GREEDY', help='HFF and HBF algorithms')
+    parser_command2.add_argument('--source_bins', type=str, help='Path to bins', required=True)
+    parser_command2.add_argument('--source_flowers', type=str, help='Path to flowers', required=True)
     parser_command2.set_defaults(func=greedy_command)
 
     # Command 3 parser
-    parser_command3 = subparsers.add_parser('GA', help='Command 2 help')
+    parser_command3 = subparsers.add_parser('GA', help='Genetic algorithm', formatter_class=argparse.RawTextHelpFormatter)
     parser_command3.add_argument(
         '--config',
         type=str,
-        help='''Ścieżka do pliku konfiguracyjnego, format pliku konfigóracyjnego to:
-    source_bins=size10/size10bins.csv
-    source_flowers=size10/count50flowers/count50flowers1.csv
-    iterations=50
-    temperature=999
-    cooling=5'''
+        help='''Ścieżka do pliku konfiguracyjnego, format pliku konfiguracyjnego to:
+source_bins=size10/size10bins.csv
+source_flowers=size10/count50flowers/count50flowers1.csv
+pop_size=100
+generations=100
+tournament=6
+cross=0.5
+mut=0.01
+results_path=genetic_results
+iterations=3'''
     )
-    parser_command3.add_argument('--source_bins', type=str, help='Path to the first source file')
-    parser_command3.add_argument('--source_flowers', type=str, help='Path to the second source file')
-    parser_command3.add_argument('--pop_size', type=int, help='Path to the first source file')
-    parser_command3.add_argument('--generations', type=int, help='Path to the second source file')
-    parser_command3.add_argument('--tournament', type=int, help='Path to the first source file')
-    parser_command3.add_argument('--cross', type=float, help='Path to the second source file')
-    parser_command3.add_argument('--mut', type=float, help='Path to the second source file')
-    parser_command3.add_argument('--results_path', type=str, help='Path to the second source file')
-    parser_command3.add_argument('--iterations', type=int, help='Path to the second source file')
+    parser_command3.add_argument('--source_bins', type=str, help='Path to bins')
+    parser_command3.add_argument('--source_flowers', type=str, help='Path to flowers')
+    parser_command3.add_argument('--pop_size', type=int, help='Population size')
+    parser_command3.add_argument('--generations', type=int, help='Number of generations (stop condition)')
+    parser_command3.add_argument('--tournament', type=int, help='Tournament size')
+    parser_command3.add_argument('--cross', type=float, help='Crossover ratio')
+    parser_command3.add_argument('--mut', type=float, help='Mutation ratio')
+    parser_command3.add_argument('--results_path', type=str, help='PAth to results directory')
+    parser_command3.add_argument('--iterations', type=int, help='Number of algorith runs')
     parser_command3.set_defaults(func=ga_command)
 
     # Command 4 parser
-    parser_command4 = subparsers.add_parser('GENERATE_DATA', help='GENERATE_DATA')
+    parser_command4 = subparsers.add_parser('GENERATE_DATA', help='GENERATE DATA')
     parser_command4.add_argument('--bins_filename', type=str, help='Path to the first source file', required=True)
     parser_command4.add_argument('--flowers_filename', type=str, help='Path to the second source file', required=True)
     parser_command4.add_argument('--data_folder', type=str, help='Path to the second source file', required=True)
