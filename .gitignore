@@ -2,3 +2,4 @@
 *data/*.csv
 venv/
 __pycache__/dataset_generator.cpython-310.pyc
+.idea/

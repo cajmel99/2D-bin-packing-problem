@@ -1,26 +1,50 @@
-import sys, getopt
-from simulated_annealing import solve_sa
+from arguments import create_parser
+from algorithms import run_algortihm_HFF_HBF, run_genetic_algorithm, solve_sa, generate_and_save_data
 
-def main(argv):
-    if len(argv) < 3:
-        print(f'Too little arguments!')
-        print(f'\nProper use:\n\t$ python simulation.py [algorithm] [bins_file] [flowers_file]')
-        print(f'\nWhere [algorithm] is one of: RA, HBF, HFF, GA, SA\n')
+if __name__ == '__main__':
+    args = None
+    try:
+        args = create_parser()
+    except Exception as e:
+        print(e)
+        exit(1)
 
-        return
+    match args.algorith:
+        case "GENERATE_DATA":
+            generate_and_save_data(
+                args.bins_filename,
+                args.flowers_filename,
+                args.data_folder,
+                args.num_bins,
+                args.bin_max_width,
+                args.bin_max_height,
+                args.num_flowers,
+                args.flower_min_width,
+                args.flower_max_width,
+                args.flower_min_height,
+                args.flower_max_height
+            )
+        case "SA":
+            print(f'\nYou\'ve chosen SA as the algorithm!')
+            print(f'\nLoaded files:\n|-> Bins file: {args.source_bins} \n|-> Flowers file: {args.source_flowers}')
+            print(f'\nParams:\n|-> Max iterations: {args.iterations} \n|-> Initial temperature: {args.temperature} \n|-> Cooling rate: {args.cooling}')
+            sim_result = solve_sa(args.source_bins, args.source_flowers, int(args.iterations), int(args.temperature), float(args.cooling))
+        case "GREEDY":
+            run_algortihm_HFF_HBF(args.source_bins, args.source_flowers)
+        case "GA":
+            run_genetic_algorithm(
+                int(args.pop_size),
+                int(args.generations),
+                int(args.tournament),
+                float(args.cross),
+                float(args.mut),
+                args.source_flowers,
+                args.source_bins,
+                args.results_path,
+                int(args.iterations)
+            )
+        case _:
+            print("ASDASD")
 
-    if argv[0] == 'SA':
-        if len(argv) < 6:
-            print(f'Too little arguments for simulated annealing algorithm!')
-            print(f'\nProper use:\n\t$ python simulation.py SA [bins_file] [flowers_file] [max_iterations] [initial_temperature] [cooling_rate]')
-
-            return
-
-        print(f'\nYou\'ve chosen SA as the algorithm!')
-        print(f'\nLoaded files:\n|-> Bins file: {argv[1]} \n|-> Flowers file: {argv[2]}')
-        print(f'\nParams:\n|-> Max iterations: {argv[3]} \n|-> Initial temperature: {argv[4]} \n|-> Cooling rate: {argv[5]}')
-        sim_result = solve_sa(argv[1], argv[2], int(argv[3]), int(argv[4]), float(argv[5]))
 
 
-if __name__ == "__main__":
-   main(sys.argv[1:])
